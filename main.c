@@ -8,7 +8,5 @@ int main() {
         }
     }
 
-    x_dump_alloced_chunks();
-
     return 0;
 }

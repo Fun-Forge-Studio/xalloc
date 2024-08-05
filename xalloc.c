@@ -23,22 +23,29 @@ ChunkList alloced_chunks = {0};
 ChunkList freed_chunks = {0};
 
 void chunk_list_dump(const ChunkList* list) {
-    printf("Chunks (%zn):\n", list->count);
+    printf("Chunks (%ld):\n", list->count);
     for(size_t i = 0; i < list->count; ++i) {
-        
+        printf("Start: %p, size: %zu\n", list->chunks[i].start, list->chunks[i].size);
     }
 }
 
 int chunk_list_find(const ChunkList* list, void* ptr) {
-    assert(false && "chunk_list_find is not implemented");
+    (void) list;
+    (void) ptr;
+    assert(false && "chunk_list_find");
     return -1;
 }
 
 void chunk_list_insert(ChunkList* list, void* ptr, size_t size){
+    (void) list;
+    (void) ptr;
+    (void) size;
     assert(false && "chunk_list_insert is not implemented");
 }
 
 void chunk_list_remove(ChunkList* list, size_t index) {
+    (void) list;
+    (void) index;
     assert(false && "chunk_list_remove is not implemented");
 }
 
@@ -56,11 +63,6 @@ void* xalloc(size_t size) {
 }
 
 void xfree(void* ptr) {
-    for(size_t i = 0; i < x_alloced_size; ++i) {
-        if(x_alloced[i].start == ptr) {
-
-        }
-    }
     (void) ptr;
     assert(false && "xfree is not implemented");
 }
