@@ -23,6 +23,7 @@ void initialize_memory_pool()
     free_list->free = 1;
 }
 
+/** @brief Manages the use of memory */
 void *xalloc(size_t size)
 {
     Block *current = free_list;
@@ -49,6 +50,7 @@ void *xalloc(size_t size)
     return NULL;
 }
 
+/** @brief Free a block allocated by `xalloc`. */
 void xfree(void *ptr)
 {
     if (!ptr)

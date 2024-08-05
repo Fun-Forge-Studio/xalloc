@@ -1,4 +1,5 @@
 #include "xalloc.c"
+#include <stdlib.h>
 
 int main() {
     initialize_memory_pool();
