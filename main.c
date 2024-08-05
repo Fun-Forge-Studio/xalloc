@@ -1,14 +1,16 @@
 #include "xalloc.c"
 
 int main() {
-    for (int i = 0; i < 20; ++i) {
-        void* p = xalloc(i);
-        //if(i %2 == 0) {
-        //    xfree(p);
-        //}
-    }
+    initialize_memory_pool();
 
-    chunk_list_dump(&alloced_chunks);
+    char* a = (char*)xalloc(100);
+
+    if(a) {
+        printf("Allocated 100 bytes.\n");
+    }
+    
+    xfree(a);
+    printf("Freed 100 bytes.\n");
 
     return 0;
 }

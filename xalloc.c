@@ -1,82 +1,71 @@
-#include <assert.h>
 #include <stdio.h>
-#include <stdbool.h>
+#include <stdlib.h>
 
-#define XCAPACITY 640000
-#define CHUNK_LIST_CAP 1024
+#define POOL_SIZE 1024 // Size of the memory pool
 
-typedef struct {
-    void* start;
+char memory_pool[POOL_SIZE]; // The memory pool
+
+typedef struct Block
+{
     size_t size;
-} XChunk;
+    struct Block *next;
+    int free;
+} Block;
 
-typedef struct {
-    size_t count;
-    XChunk chunks[CHUNK_LIST_CAP];
-} ChunkList;
+#define BLOCK_SIZE sizeof(Block)
 
-char x[XCAPACITY] = {0};
-size_t xsize = 0;
+Block *free_list = (void *)memory_pool; // Start of the free list
 
-ChunkList alloced_chunks = {0};
-ChunkList freed_chunks = {0};
+void initialize_memory_pool()
+{
+    free_list->size = POOL_SIZE - BLOCK_SIZE;
+    free_list->next = NULL;
+    free_list->free = 1;
+}
 
-void chunk_list_dump(const ChunkList* list) {
-    printf("Chunks (%ld):\n", list->count);
-    for(size_t i = 0; i < list->count; ++i) {
-        printf("Start: %p, size: %zu\n", list->chunks[i].start, list->chunks[i].size);
+void *xalloc(size_t size)
+{
+    Block *current = free_list;
+    while (current != NULL)
+    {
+        if (current->free && current->size >= size)
+        {
+            if (current->size > size + BLOCK_SIZE)
+            {
+                // Split the block
+                Block *new_block = (void *)((char *)current + BLOCK_SIZE + size);
+                new_block->size = current->size - size - BLOCK_SIZE;
+                new_block->next = current->next;
+                new_block->free = 1;
+
+                current->size = size;
+                current->next = new_block;
+            }
+            current->free = 0;
+            return (void *)((char *)current + BLOCK_SIZE);
+        }
+        current = current->next;
     }
+    return NULL;
 }
 
-int chunk_list_find(const ChunkList* list, void* ptr) {
-    (void) list;
-    (void) ptr;
-    assert(false && "chunk_list_find");
-    return -1;
-}
+void xfree(void *ptr)
+{
+    if (!ptr)
+        return;
 
-void chunk_list_insert(ChunkList* list, void* start, size_t size){
-    assert(list->count < CHUNK_LIST_CAP);
+    Block *block_ptr = (Block *)((char *)ptr - BLOCK_SIZE);
+    block_ptr->free = 1;
 
-    list->chunks[list->count].start = start;
-    list->chunks[list->count].size = size;
-
-    for(size_t i = list->count; i > 0 && list->chunks[i].start < list->chunks[i - 1].size; --i) {
-        const XChunk t = list->chunks[i];
-        list->chunks[i]  = list->chunks[i - 1];
-        list->chunks[i - 1] = t;
+    // Merge contiguous free blocks
+    Block *current = free_list;
+    while (current != NULL)
+    {
+        if (current->free && current->next && current->next->free)
+        {
+            current->size += current->next->size + BLOCK_SIZE;
+            current->next = current->next->next;
+        }
+        current = current->next;
     }
-
-    (void) list;
-    (void) start;
-    (void) size;
-    assert(false && "chunk_list_insert is not implemented");
-}
-
-void chunk_list_remove(ChunkList* list, size_t index) {
-    (void) list;
-    (void) index;
-    assert(false && "chunk_list_remove is not implemented");
-}
-
-void* xalloc(size_t size) {
-
-    if(size > 0) {
-        assert(xsize + size <= XCAPACITY);
-        void* ptr = x + xsize;
-        xsize += size;
-        chunk_list_insert(&alloced_chunks, ptr, size);
-        return ptr;
-    } else {
-        return NULL;
-    }
-}
-
-void xfree(void* ptr) {
-    (void) ptr;
-    assert(false && "xfree is not implemented");
-}
-
-void xcollect() {
-    assert(false && "xcollect is not implemented");
 }
