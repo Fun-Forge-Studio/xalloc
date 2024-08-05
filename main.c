@@ -1,14 +1,14 @@
 #include "xalloc.c"
 
 int main() {
-    char* root = xalloc(69);
-    for(int i = 0; i < 69; ++i) {
-        root[i] = i + 'A';
+    for (int i = 0; i < 20; ++i) {
+        void* p = xalloc(i);
+        if(i %2 == 0) {
+            xfree(p);
+        }
     }
 
     x_dump_alloced_chunks();
-
-    xfree(root);
 
     return 0;
 }
