@@ -18,17 +18,20 @@ size_t x_alloced_size = 0;
 
 void* xalloc(size_t size) {
 
-    assert(xsize + size <= XCAPACITY);
-    void* result = x + xsize;
-    xsize += size;
-
-    const XChunk chunk = {
-        .start = result,
-        .size = size,
-    };
-    assert(x_alloced_size < XALLOCED_CAPACITY);
-    x_alloced[x_alloced_size++] = chunk;
-    return result;
+    if(size > 0) {
+        assert(xsize + size <= XCAPACITY);
+        void* result = x + xsize;
+        xsize += size;
+        const XChunk chunk = {
+            .start = result,
+            .size = size,
+        };
+        assert(x_alloced_size < XALLOCED_CAPACITY);
+        x_alloced[x_alloced_size++] = chunk;
+        return result;
+    } else {
+        return 0;
+    }
 }
 
 void x_dump_alloced_chunks(void) {
