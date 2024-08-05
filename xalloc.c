@@ -35,9 +35,20 @@ int chunk_list_find(const ChunkList* list, void* ptr) {
     return -1;
 }
 
-void chunk_list_insert(ChunkList* list, void* ptr, size_t size){
+void chunk_list_insert(ChunkList* list, void* start, size_t size){
+    assert(list->count < CHUNK_LIST_CAP);
+
+    list->chunks[list->count].start = start;
+    list->chunks[list->count].size = size;
+
+    for(size_t i = list->count; i > 0 && list->chunks[i].start < list->chunks[i - 1].size; --i) {
+        const XChunk t = list->chunks[i];
+        list->chunks[i]  = list->chunks[i - 1];
+        list->chunks[i - 1] = t;
+    }
+
     (void) list;
-    (void) ptr;
+    (void) start;
     (void) size;
     assert(false && "chunk_list_insert is not implemented");
 }
