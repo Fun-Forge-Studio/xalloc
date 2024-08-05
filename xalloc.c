@@ -3,8 +3,7 @@
 #include <stdbool.h>
 
 #define XCAPACITY 640000
-#define XALLOCED_CAPACITY 1024
-#define XFREED_CAPACITY 1024
+#define CHUNK_LIST_CAP 1024
 
 typedef struct {
     void* start;
@@ -13,7 +12,7 @@ typedef struct {
 
 typedef struct {
     size_t count;
-    XChunk chunks[XALLOCED_CAPACITY];
+    XChunk chunks[CHUNK_LIST_CAP];
 } ChunkList;
 
 char x[XCAPACITY] = {0};
